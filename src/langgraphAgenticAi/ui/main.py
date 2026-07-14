@@ -1,7 +1,8 @@
 import streamlit as st
-import os
-
 from src.langgraphAgenticAi.ui.streamlitui.loadui import LoadStreamlitUI
+from src.langgraphAgenticAi.ui.streamlitui.display_result import DisplayResultStreamlit
+from src.langgraphAgenticAi.graph.graph_builder import GraphBuilder
+from src.langgraphAgenticAi.llms.groqllm import GroqLlm
 
 def load_langgraph_agentic_app():
     """
@@ -24,20 +25,28 @@ def load_langgraph_agentic_app():
     user_message = st.chat_input("Enter your message:", key="user_message")
 
     if user_message:
-        # configure llms
-        obj_llm_config = {
-            "llm": user_controls.get('llm'),
-            "groq_model": user_controls.get('groq_model'),
-            "groq_api_key": user_controls.get('groq_api_key'),
-        }
+        try:
+            if user_controls.get('llm') != 'Groq':
+                st.warning("Only Groq is supported for now.")
+                return
 
-        model = obj_llm_config.get('llm')
+            model = GroqLlm(user_controls).get_llm_model()
 
-        if not model:
-            st.warning("Please select a valid LLM from the dropdown.")
-            return
+            if model is None:
+                return
 
-        usecase = user_controls.get('selected_usecase')
-        if not usecase:
-            st.warning("Please select a valid use case from the dropdown.")
-            return        
+            usecase = user_controls.get('selected_usecase')
+            if not usecase:
+                st.warning("Please select a valid use case from the dropdown.")
+                return        
+            graph_builder = GraphBuilder(model=model)
+            try:
+                graph = graph_builder.setup_graph(usecase=usecase)
+                DisplayResultStreamlit(usecase, graph, user_message).display_result_on_ui() 
+            except Exception as e:
+                st.error(f"An error occurred while setting up the graph: {str(e)}")
+                return
+
+        
+        except Exception as e:
+            st.error(f"An error occurred while processing the user input: {str(e)}")

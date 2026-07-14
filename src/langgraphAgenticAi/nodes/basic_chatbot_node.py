@@ -1,3 +1,7 @@
+from typing import Dict
+
+from langchain_core.messages import AIMessage
+
 from src.langgraphAgenticAi.state.state import State
 
 
@@ -7,13 +11,15 @@ class BasicChatbotNode:
     """
 
     def __init__(self, model):
-        self.llm = model 
+        self.llm = model
 
-    
-    def process(self , state:State)-> Dict:
+    def process(self, state: State) -> Dict:
         """
-        Processes the input state and generates a response using the LLM model.
-        Args:
-            state (State): The current state containing user input and other relevant information.
+        Process the input state and generate a response using the language model.
+        """
+        response = self.llm.invoke(state["messages"])
 
-    
+        if isinstance(response, str):
+            response = AIMessage(content=response)
+
+        return {"messages": [response]}
