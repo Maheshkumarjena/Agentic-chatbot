@@ -1,5 +1,4 @@
 import streamlit as st
-import os
 
 from src.langgraphAgenticAi.ui.uiConfigFile import Config
 
@@ -20,7 +19,7 @@ class LoadStreamlitUI:
             # LLM selection
             self.user_controls['llm'] = st.selectbox("Select LLM", llm_options)
 
-            # Model Selection (Groq)
+            # Model Selection
             if self.user_controls.get('llm') == 'Groq':
                 model_options = self.config.get_groq_model_options()
                 self.user_controls['groq_model'] = st.selectbox("Select Groq Model", model_options)
@@ -32,6 +31,16 @@ class LoadStreamlitUI:
 
                 if not self.user_controls['groq_api_key']:
                     st.warning("Please enter your Groq API key to proceed. You can obtain it from https://console.groq.ai/")
+
+            if self.user_controls.get('llm') == 'Ollama':
+                model_options = self.config.get_ollama_model_options()
+                self.user_controls['ollama_model'] = st.selectbox("Select Ollama Model", model_options)
+                self.user_controls['ollama_base_url'] = st.text_input(
+                    "Ollama Base URL",
+                    value="http://localhost:11434",
+                    help="Use the local Ollama server running on this device.",
+                )
+                st.caption("Make sure Ollama is running locally and the selected model is already pulled.")
 
             # Use case selection
             self.user_controls['selected_usecase'] = st.selectbox("Select Use Case", usecase_options)

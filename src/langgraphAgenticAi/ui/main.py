@@ -3,6 +3,7 @@ from src.langgraphAgenticAi.ui.streamlitui.loadui import LoadStreamlitUI
 from src.langgraphAgenticAi.ui.streamlitui.display_result import DisplayResultStreamlit
 from src.langgraphAgenticAi.graph.graph_builder import GraphBuilder
 from src.langgraphAgenticAi.llms.groqllm import GroqLlm
+from src.langgraphAgenticAi.llms.ollama_llm import OllamaLlm
 
 def load_langgraph_agentic_app():
     """
@@ -26,11 +27,15 @@ def load_langgraph_agentic_app():
 
     if user_message:
         try:
-            if user_controls.get('llm') != 'Groq':
-                st.warning("Only Groq is supported for now.")
-                return
+            selected_llm = user_controls.get('llm')
 
-            model = GroqLlm(user_controls).get_llm_model()
+            if selected_llm == 'Groq':
+                model = GroqLlm(user_controls).get_llm_model()
+            elif selected_llm == 'Ollama':
+                model = OllamaLlm(user_controls).get_llm_model()
+            else:
+                st.warning("Please select a supported LLM.")
+                return
 
             if model is None:
                 return

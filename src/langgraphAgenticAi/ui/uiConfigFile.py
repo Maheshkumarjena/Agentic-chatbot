@@ -16,6 +16,9 @@ class Config:
 
     def get_groq_model_options(self):
         return self._split_and_strip(self.config['Default'].get("GROQ_MODEL_OPTIONS"))
+
+    def get_ollama_model_options(self):
+        return self._split_and_strip(self.config['Default'].get("OLLAMA_MODEL_OPTIONS"))
     
     def get_page_title(self):
         return self.config['Default'].get("PAGE_TITLE")
